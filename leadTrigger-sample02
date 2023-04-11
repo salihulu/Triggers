@@ -1,0 +1,50 @@
+// While creating a Lead assign ‘Other’ if Lead Source is null. (Before insert)
+//  After creating Lead record , create a Task. (After insert)
+
+
+trigger LeadTrigger on Lead (before insert,
+                             before update, 
+                             before delete, 
+                             after insert, 
+                             after update, 
+                             after delete, 
+                             after undelete) {
+                             
+
+SWITCH on Trigger.operationType {
+        
+        WHEN BEFORE_INSERT  {
+        // While creating a Lead assign ‘Other’ if Lead Source is null. (Before insert)
+          	
+
+            for(Lead newLead : Trigger.new){
+                if(newLead.LeadSource == null){
+                   newLead.LeadSource = 'Other'; 
+                }
+            }
+ }
+        WHEN BEFORE_UPDATE  { }
+        WHEN BEFORE_DELETE  { }
+        WHEN AFTER_INSERT   {  
+        //  After creating Lead record , create a Task. (After insert)
+            
+            List<Task> taskList = new List<Task>();
+            
+            for(Lead newLead : Trigger.new){
+                
+                Task newTsk = new Task();
+                newTsk.Subject = 'New Task created, Please contact...';
+                newTsk.OwnerId = newLead.OwnerId ;
+                newTsk.WhoId = newLead.Id;
+                
+                taskList.add(newTsk);
+             }
+            database.insert(taskList);
+        }
+        WHEN AFTER_UPDATE   { }
+        WHEN AFTER_DELETE   { }
+        WHEN AFTER_UNDELETE { }
+ 
+    }
+   
+}
