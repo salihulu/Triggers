@@ -1,6 +1,5 @@
 // Create an error (Warning) trigger when a Lead is updated 
-// from 'Open - Not Contacted' status to 'Closed - Converted' 
-// or 'Closed - Not Converted' status.(Validation)
+// from 'Open - Not Contacted' status to 'Closed - Converted' or 'Closed - Not Converted' status.(Validation)
 
 trigger LeadTrigger on Lead (before insert,
                              before update, 
