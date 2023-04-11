@@ -1,5 +1,5 @@
 trigger templateTrigger on Account (
-    						 before insert,
+    			     before insert,
                              before update, 
                              before delete, 
                              after insert, 
