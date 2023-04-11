@@ -1,0 +1,34 @@
+// Create an error (Warning) trigger when a Lead is updated 
+// from 'Open - Not Contacted' status to 'Closed - Converted' 
+// or 'Closed - Not Converted' status. (Validation)
+
+trigger LeadTrigger on Lead (before insert,
+                             before update, 
+                             before delete, 
+                             after insert, 
+                             after update, 
+                             after delete, 
+                             after undelete) {                             
+
+SWITCH on Trigger.operationType {
+        
+        WHEN BEFORE_INSERT  { }
+        WHEN BEFORE_UPDATE  {
+        
+            for(Lead newLead : Trigger.new){
+                Lead oldLead = Trigger.oldMap.get(newLead.Id);
+                if (oldLead.Status == 'Open - Not Contacted' && (newLead.Status == 'Closed - Converted' || newLead.Status == 'Closed - Not Converted')){
+                    newLead.addError('Warning!!! You have to meeting with lead before convert!!!');
+                }
+            }
+        }
+        WHEN BEFORE_DELETE  { }
+        WHEN AFTER_INSERT   { }
+        WHEN AFTER_UPDATE   { }
+        WHEN AFTER_DELETE   { }
+        WHEN AFTER_UNDELETE { }
+        }
+ 
+    }
+   
+}

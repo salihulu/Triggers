@@ -1,4 +1,0 @@
-// Create an error (Warning) trigger when a Lead is updated 
-// from 'Open - Not Contacted' status to 'Closed - Converted' 
-// or 'Closed - Not Converted' status. (Validation)
-
