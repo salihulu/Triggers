@@ -1,0 +1,27 @@
+trigger accountTrigger on Account (before insert , before update , before delete , after insert , after update, after delete, after undelete) {
+ 
+    SWITCH on Trigger.operationType {
+       WHEN BEFORE_INSERT { }
+       WHEN BEFORE_UPDATE { 
+       
+       /*•Create a filed named ‘Old Phone’ on account object
+			•Whenever phone field is updated on Account record
+			•Then Old Phone field should also get updated with old versions of phone number on account
+		  */
+           
+           for(Account accNew : Trigger.new){
+               Account accOld = trigger.oldMap.get(accNew.id);
+               if(accNew.Phone != accOld.Phone){ //Updated records' phone field!!
+                   accNew.old_phones__c = accNew.old_phones__c + ' , ' + accOld.Phone;
+               }
+           }
+
+          
+       }
+       WHEN BEFORE_DELETE { }
+       WHEN AFTER_INSERT  { }
+       WHEN AFTER_UPDATE  { }
+       WHEN AFTER_DELETE  { }
+       WHEN AFTER_UNDELETE { }
+   }
+}
