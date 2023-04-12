@@ -12,7 +12,9 @@ trigger opportunityTrigger on Opportunity (
         
         WHEN BEFORE_INSERT  { }
         WHEN BEFORE_UPDATE  { 
-        
+	
+        //Whenever Opportunity is updated show name of user who updates opportunity on description of Opportunity
+	
         for(Opportunity opp : trigger.new){
             	Opportunity oldOpp = Trigger.oldMap.get(opp.Id);
         
