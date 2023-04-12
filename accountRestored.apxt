@@ -1,0 +1,24 @@
+trigger accountTrigger on Account (before insert , before update , before delete , after insert , after update, after delete, after undelete) {
+ 
+    SWITCH on Trigger.operationType {
+       WHEN BEFORE_INSERT { }
+       WHEN BEFORE_UPDATE { }
+       WHEN BEFORE_DELETE { }
+       WHEN AFTER_INSERT  { }
+       WHEN AFTER_UPDATE  { }
+       WHEN AFTER_DELETE  { }
+       WHEN AFTER_UNDELETE { 
+             //When ever an account is restored, 
+             //state restore information like restore time and 
+             //who restored the record on the description field of RELATED CONTACT
+             
+           List<Contact> cntList = [SELECT Id, AccountId, Description FROM Contact  WHERE AccountId IN:Trigger.newMap.keySet()];
+        
+           For(Contact cnt : cntList ) {
+        		Cnt.Description = 'Account restored by ' + System.UserInfo.getName() + ' , on  ' + system.today();
+         	}
+        	Database.update(cntList );
+        
+       }
+   }
+}
