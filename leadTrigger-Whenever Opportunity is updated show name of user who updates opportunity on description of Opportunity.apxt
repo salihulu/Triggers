@@ -1,0 +1,32 @@
+trigger opportunityTrigger on Opportunity (
+    						             before insert,
+                             before update, 
+                             before delete, 
+                             after insert, 
+                             after update, 
+                             after delete, 
+                             after undelete) 
+{
+
+	SWITCH on Trigger.operationType {
+        
+        WHEN BEFORE_INSERT  { }
+        WHEN BEFORE_UPDATE  { 
+        
+        for(Opportunity opp : trigger.new){
+            	Opportunity oldOpp = Trigger.oldMap.get(opp.Id);
+        
+                opp.Description = oldOpp.Description + ' , ' + System.UserInfo.getName();
+            }
+            
+            
+          }
+        WHEN BEFORE_DELETE  { }
+        WHEN AFTER_INSERT   { }
+        WHEN AFTER_UPDATE   { }
+        WHEN AFTER_DELETE   { }
+        WHEN AFTER_UNDELETE { }
+ 
+    }
+   
+}
