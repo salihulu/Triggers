@@ -1,0 +1,59 @@
+trigger contactTrigger on Contact (
+    			     before insert,
+                             before update, 
+                             before delete, 
+                             after insert, 
+                             after update, 
+                             after delete, 
+                             after undelete) 
+{
+
+SWITCH on Trigger.operationType {
+        WHEN BEFORE_INSERT  { }
+        WHEN BEFORE_UPDATE  { }
+        WHEN BEFORE_DELETE  { }
+        WHEN AFTER_INSERT   {
+           ContactTriggerHandler.contactSayisiBulma(Trigger.new );
+        }
+        WHEN AFTER_UPDATE   {
+          ContactTriggerHandler.contactSayisiBulma(Trigger.new );
+        }
+        WHEN AFTER_DELETE   {
+          ContactTriggerHandler.contactSayisiBulma(Trigger.OLD);
+        }
+        WHEN AFTER_UNDELETE {
+       ContactTriggerHandler.contactSayisiBulma(Trigger.new );
+        }
+    }
+   
+}
+
+//Handler Part
+
+public class ContactTriggerHandler {
+    public static void contactSayisiBulma(List<Contact> yeniContList ){
+              List<Id> accountIdleri = new List<Id>();
+            for(Contact cnt: yeniContList){
+               if( cnt.AccountId != null ){
+                    accountIdleri.add( cnt.AccountId );
+                  }
+               }
+            if( accountIdleri.size() > 0   ) {
+                 List<account> accList =  [SELECT  id ,Contact_Number__c ,  (SELECT id FROM Contacts)  FROM Account WHERE id IN:accountIdleri ];
+                  for(Account acc : accList){
+                         acc.Contact_Number__c = acc.Contacts.size();
+                  }
+              database.update(accList);
+             }
+    }
+}
+
+
+//Anonymous Window - For old records (After trigger and handler)
+
+List<account> accList =  [SELECT  id ,Contact_Number__c ,  (SELECT id FROM Contacts)  FROM Account ];
+                  for(Account acc : accList){
+                         acc.Contact_Number__c = acc.Contacts.size();
+                  }
+              database.update(accList);
+
