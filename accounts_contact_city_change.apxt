@@ -1,0 +1,28 @@
+trigger accountTrigger on Account (before insert , before update , before delete , after insert , after update, after delete, after undelete) {
+ 
+    SWITCH on Trigger.operationType {
+       WHEN BEFORE_INSERT { }
+       WHEN BEFORE_UPDATE { 
+       
+       // List<Id> accIds = new List<Id>();
+            Set<Id> accIds = new Set<Id>();
+            for (Account yeniAcc :Trigger.new){
+            //Account eskiHal =Trigger.oldMap.get(yeniAcc .Id);
+                  if (yeniAcc .BillingCity != Trigger.oldMap.get(yeniAcc.Id).BillingCity){
+                           accIds.add(yeniAcc .Id);
+                  }
+            }
+            List<Contact> conList = [SELECT id, MailingCity , Account.BillingCity FROM Contact WHERE AccountId IN :accIds];
+            For(Contact con:conList){
+                     con.MailingCity = con.Account.BillingCity;
+            }
+            Database.update(conList);
+           
+       }
+       WHEN BEFORE_DELETE { }
+       WHEN AFTER_INSERT  { }
+       WHEN AFTER_UPDATE  { }
+       WHEN AFTER_DELETE  { }
+       WHEN AFTER_UNDELETE { }
+   }
+}
