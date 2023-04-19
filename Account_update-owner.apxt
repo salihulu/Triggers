@@ -1,0 +1,85 @@
+trigger AccountTrigger on Account (before insert , before update , before delete , after insert , after update, after delete, after undelete ) {
+  SWITCH on Trigger.operationType {
+        
+        WHEN BEFORE_INSERT  { 
+       
+            
+ // When we create the Account record, the Account Owner will be automatically added to Sales Rep field.
+ //  When we update the Account owner of the record, then also the Sales Rep will be automatically updated.
+         
+            Set<Id> setOfAccOwnerIds = new Set<Id>();
+            
+            for(Account acc : trigger.new){
+                
+               setOfAccOwnerIds.add( acc.OwnerId   );                    
+            }
+            
+            List<user> AccOwnerUser =  [SELECT  id ,name FROM user WHERE id IN: setOfAccOwnerIds] ; 
+            
+            Map <Id,User> userMap = new Map<Id,User>(AccOwnerUser) ;
+         //   Map <Id,User> userMap = new Map<Id,User>([SELECT  id ,name FROM user WHERE id IN: setOfAccOwnerIds]) ;
+            
+            for(Account acc: trigger.new){
+                   
+                user recordSahibi= userMap.get(acc.OwnerId);
+                acc.Sales_Repr__c = recordSahibi.Name ;
+                
+              /*
+                for( User sr :AccOwnerUser ) {
+                    if( acc.OwnerId == sr.id   )  {
+                        
+                      acc.Sales_Repr__c = sr.Name ;  
+                    }
+                 }
+             */
+             
+            }
+            
+            
+            
+        }
+        WHEN BEFORE_UPDATE  {
+    
+            
+
+      // When we create the Account record, the Account Owner will be automatically added to Sales Rep field.
+ //  When we update the Account owner of the record, then also the Sales Rep will be automatically updated.      
+            
+        Set<Id> setOfAccOwnerIds = new Set<Id>();
+            
+            for(Account acc : trigger.new){
+                Account oldAcc = Trigger.oldMap.get(acc.Id);
+                if(acc.OwnerId !=  oldAcc.OwnerId) {  
+                  setOfAccOwnerIds.add( acc.OwnerId   );  
+                }
+                                 
+            }
+            
+            List<user> AccOwnerUser =  [SELECT  id ,name FROM user WHERE id IN: setOfAccOwnerIds] ; 
+            
+            if( AccOwnerUser.size() >0   ){
+                Map <Id,User> userMap = new Map<Id,User>(AccOwnerUser) ;
+             //   Map <Id,User> userMap = new Map<Id,User>([SELECT  id ,name FROM user WHERE id IN: setOfAccOwnerIds]) ;
+                
+                for(Account acc: trigger.new){
+                       
+                    user recordSahibi= userMap.get(acc.OwnerId);
+                    acc.Sales_Repr__c = recordSahibi.Name ;
+                    
+                  /*
+                    for( User sr :AccOwnerUser ) {
+                        if( acc.OwnerId == sr.id   )  {
+                            
+                          acc.Sales_Repr__c = sr.Name ;  
+                        }
+                     }
+                 */
+                 
+                } 
+            }
+        }
+        WHEN BEFORE_DELETE  { }
+        WHEN AFTER_INSERT   { }
+        WHEN AFTER_UPDATE   { }
+        WHEN AFTER_DELETE   { }
+        WHEN AFTER_UNDELETE { }
