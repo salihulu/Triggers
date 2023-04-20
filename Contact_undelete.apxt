@@ -1,0 +1,27 @@
+trigger contactTrigger on Contact (
+    			     before insert,
+                             before update, 
+                             before delete, 
+                             after insert, 
+                             after update, 
+                             after delete, 
+                             after undelete) 
+{
+
+SWITCH on Trigger.operationType {
+        WHEN BEFORE_INSERT  { }
+        WHEN BEFORE_UPDATE  { }
+        WHEN BEFORE_DELETE  { 
+        for( contact con : Trigger.old){
+              if (con.AccountId == null){
+               con.addError('Attention: You are not!!!');
+           } 
+           }
+        }
+        WHEN AFTER_INSERT   { }
+        WHEN AFTER_UPDATE   { }
+        WHEN AFTER_DELETE   { }
+        WHEN AFTER_UNDELETE { }
+    }
+   
+}
