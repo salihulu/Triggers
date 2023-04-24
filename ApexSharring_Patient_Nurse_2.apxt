@@ -1,0 +1,84 @@
+//hasta.trigger.apxt
+
+trigger HastaTrigger on Hasta__c (
+    			     			before insert,
+                             	before update, 
+                             	before delete, 
+                             	after insert, 
+                             	after update, 
+                             	after delete, 
+                             	after undelete) 
+{
+
+	SWITCH on Trigger.operationType {
+        
+        WHEN BEFORE_INSERT  { }
+        WHEN BEFORE_UPDATE  { }
+        WHEN BEFORE_DELETE  { }
+        WHEN AFTER_INSERT   { 
+            
+          
+            List<Hasta__share> yeniSharingList = new List<Hasta__share>();
+            
+            for(Hasta__c hasta : Trigger.new){
+                Hasta__share record1 = HastaTriggerHandler.sharingRecordUret(hasta.ID, hasta.Hemsire__c);
+                yeniSharingList.add(record1);
+                Hasta__share record2 = HastaTriggerHandler.sharingRecordUret(hasta.ID, hasta.Doctor__c);
+                yeniSharingList.add(record2);
+            }
+            
+        
+        }
+        WHEN AFTER_UPDATE   { }
+        WHEN AFTER_DELETE   { }
+        WHEN AFTER_UNDELETE { }
+ 
+    }
+   
+}
+
+// HastaTriggerHandler.apxc // Method class
+
+public class HastaTriggerHandler {
+    
+    public static VOID sharingAyarla(List<Hasta__c> hastaList){
+        
+          List<Hasta__share> yeniSharingList = new List <Hasta__share>();
+            
+            for(Hasta__c hasta : hastaList){
+                Hasta__share yeniPaylasim = new Hasta__share();
+                yeniPaylasim.ParentId = hasta.Id;
+                yeniPaylasim.UserOrGroupId = hasta.Hemsire__c;
+                yeniPaylasim.AccessLevel = 'Edit';
+                yeniPaylasim.RowCause = 'Manual';
+                
+                yeniSharingList.add(yeniPaylasim);
+                
+                Hasta__share yeniPaylasim1 = new Hasta__share();
+                yeniPaylasim1.ParentId = hasta.Id;
+                yeniPaylasim1.UserOrGroupId = hasta.Doctor__c;
+                yeniPaylasim1.AccessLevel = 'Edit';
+                yeniPaylasim1.RowCause = 'Manual';
+                
+                yeniSharingList.add(yeniPaylasim1);
+                
+            }
+            database.insert(yeniSharingList);
+            
+        
+        
+    }
+    
+    public static Hasta__share sharingRecordUret (id hastaId, id sharingId){
+        Hasta__share yeniPaylasim = new Hasta__share();
+            yeniPaylasim.ParentId = hastaId;
+            yeniPaylasim.UserOrGroupId = sharingId;
+            yeniPaylasim.AccessLevel = 'Edit';
+            yeniPaylasim.RowCause = 'Manual';
+            
+            return yeniPaylasim;
+        }
+        
+    
+
+}
